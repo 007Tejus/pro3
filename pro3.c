@@ -1,77 +1,61 @@
-#include<stdio.h>
-#include<time.h>
-int n,a[50][50],i,j,count=0,reach[50],pos[50];
-void read_matrix();
-void dfs(int v);
-int adjacent(int i);
-int checkreach(int u);
+#include <stdio.h>
+#include <time.h>
 
-int main()
-{
-        int v;
-        double clk;
-        clock_t starttime,endtime;
-        printf("\n\t\t\t DEPTH FIRST SEARCH \n");
-        printf("\n Enter number of Lands to be surveyed:");
-        scanf("%d",&n);
-        for(i=1;i<=n;i++)
-       {	
-          	pos[i]=0;
-       }
-        read_matrix();
-        printf("\n Enter the starting Land number:");
-        scanf("%d",&v);
-        starttime=clock();
-        dfs(v);
-        endtime=clock();
-        clk=(double)(endtime-starttime)/CLOCKS_PER_SEC;
-        printf("\n Vertices reached from the given vertex are...\n");
-       for(i=1;i<=count;i++)
-       {
-	printf("%d\t",reach[i]);
-       }
-        printf("\nThe run time is %f\n",clk);
-		return 0;
+int max(int x, int y) {
+    return (x > y) ? x : y;
 }
 
-void read_matrix()
-{
-	printf("\n Enter the adjacency matrix (Enter 0/1)\n");
-	for(i=1;i<=n;i++)
-	for(j=1;j<=n;j++)
-	if(i!=j)
-	{
-		printf("(%d,%d):",i,j);
-		scanf("%d",&a[i][j]);
-	}
+int knap(int n, int w[10], int value[10], int m, int v[10][10]) {
+    int i, j;
+    for (i = 0; i <= n; i++) {
+        for (j = 0; j <= m; j++) {
+            if (i == 0 || j == 0) {
+                v[i][j] = 0;
+            } else if (j < w[i]) {
+                v[i][j] = v[i - 1][j];
+            } else {
+                v[i][j] = max(v[i - 1][j], value[i] + v[i - 1][j - w[i]]);
+            }
+        }
+    }
+    printf("\nThe table for solving knapsack problem using dynamic programming is:\n");
+    for (i = 0; i <= n; i++) {
+        for (j = 0; j <= m; j++) {
+            printf("%d\t", v[i][j]);
+        }
+        printf("\n");
+    }
+    return v[n][m];
 }
 
-void dfs(int v)
-{
-	int u;
-	reach[++count]=v;
-	u=adjacent(v);
-	while(u)
-	{
-		if(checkreach(u)==0) dfs(u);
-		u=adjacent(v);
-	}
-}
-int adjacent(int i)
-{
-	for(j=pos[i]+1;j<=n;j++)
-	if(a[i][j]==1)
-	{
-		pos[i]=j;
-		return j;
-	}
-	pos[i]=n+1;
-	return 0;
-}
- int checkreach(int u)
-{
-	for(i=1;i<=count;i++)
-	if(reach[i]==u)
-		return 1;
-	return 0;
+
+
+int main() {
+    double clk;
+    clock_t starttime, endtime;
+    int v[10][10], n, i, j, w[10], value[10], m, result;
+    printf("Enter the number of items: ");
+    scanf("%d", &n);
+    printf("Enter the weights of %d items:\n", n);
+    for (i = 1; i <= n; i++) {
+        scanf("%d", &w[i]);
+    }
+    printf("Enter the value of %d items: ", n);
+    for (i = 1; i <= n; i++) {
+        scanf("%d", &value[i]);
+    }
+    printf("Enter the capacity of the basket: ");
+    scanf("%d", &m);
+    for (i = 0; i <= n; i++) {
+        for (j = 0; j <= m; j++) {
+            v[i][j] = 0;
+        }
+    }
+    starttime = clock();
+    result = knap(n, w, value, m, v);
+    endtime = clock();
+    clk = (double)(endtime - starttime) / CLOCKS_PER_SEC;
+    printf("Optimal solution for the knapsack problem is %d\n", result);
+    printf("%f seconds\n", clk);
+    return 0;
 }
